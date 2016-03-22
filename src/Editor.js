@@ -192,7 +192,7 @@ export default class Editor extends Component {
 
     return (
       <div>
-        <div style={{width: 640, padding: '5px 0'}}>
+        <div style={{padding: '5px 0'}}>
           <div style={{height: 5, position: 'relative', background: 'rgba(0,0,0,0.5)', margin: 12}}>
             <div style={{height: 5, position: 'absolute', background: colors.red600, left: `${start}%`, width: `${diffStartToEnd}%`}} />
             {renderPoint(this.state.start, colors.grey400, false)}

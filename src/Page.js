@@ -114,13 +114,15 @@ export default class Page extends Component {
         <div style={{background: colors.grey900, minHeight: '100%', overflow: 'auto'}}>
           <div style={{
               minHeight: videoId && !isLoading ? '0' : '100vh',
+              minWidth: '400px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               background: colors.red500,
               boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.12), 0px 1px 4px rgba(0, 0, 0, 0.12)',
-              transition: 'min-height 1.5s ease 0s'}}>
-            <div style={{padding: '15px', textAlign: 'center'}}>
+              transition: 'min-height 1.5s ease 0s',
+              padding: '15px'}}>
+            <div style={{textAlign: 'center', maxWidth: '640px', width: '100%'}}>
               <h1 style={{
                   transition: 'all 1.5s ease 0s',
                   fontFamily: 'Roboto, sans-serif',
@@ -134,7 +136,7 @@ export default class Page extends Component {
                 </a>
               </h1>
               {route === 'home' &&
-                <Paper style={{width: 640, margin: 'auto', display: 'flex'}}>
+                <Paper style={{margin: 'auto', display: 'flex'}}>
                   <IconButton>
                     <AvPlay />
                   </IconButton>
@@ -155,18 +157,20 @@ export default class Page extends Component {
             </div>
           </div>
           {videoId &&
-            <div style={{width: 640, textAlign: 'center', margin: 'auto', marginTop: 24}}>
-              <YouTube
-                className="block"
-                videoId={videoId}
-                onReady={(e) => this.setState({video: e.target})}
-                opts={{
-                  playerVars: {
-                    autoplay: 1,
-                    start: this.state.start,
-                    end: this.state.end,
-                  }
-                }} />
+            <div style={{minWidth: '400px', maxWidth: '800px', textAlign: 'center', margin: 'auto', marginTop: '24px', padding: '0 15px'}}>
+              <div className="responsive-iframe" style={{marginLeft: '-15px', marginRight: '-15px'}}>
+                <YouTube
+                  className="block"
+                  videoId={videoId}
+                  onReady={(e) => this.setState({video: e.target})}
+                  opts={{
+                    playerVars: {
+                      autoplay: 1,
+                      start: this.state.start,
+                      end: this.state.end,
+                    }
+                  }} />
+              </div>
               {this.state.video && route === 'home' && <Editor video={this.state.video} videoId={videoId} onVideoSent={(id, url) => this.setState({id, url})} />}
               {this.state.video && route === 'video' && (
                 <div style={{fontFamily: 'Roboto, sans-serif', color: 'white', margin: '24px 0'}}>
