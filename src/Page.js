@@ -114,7 +114,7 @@ export default class Page extends Component {
         <div style={{background: colors.grey900, minHeight: '100%', overflow: 'auto'}}>
           <div style={{
               minHeight: videoId && !isLoading ? '0' : '100vh',
-              minWidth: '400px',
+              minWidth: '280px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -128,11 +128,11 @@ export default class Page extends Component {
                   fontFamily: 'Roboto, sans-serif',
                   textAlign: 'center',
                   color: 'white',
-                  fontSize: route === 'home' || isLoading ? '5rem' : '3rem',
+                  fontSize: route === 'home' || isLoading ? '5em' : '3em',
                   margin: route === 'home' || isLoading ? '' : '0'}}>
                 <a style={{textDecoration: 'none', color: 'white'}} href="/">
                   You
-                  <span style={{color: colors.red500, background: 'white', borderRadius: '.5em', margin: 5, padding: 5}}>Show</span>
+                  <span style={{color: colors.red500, background: 'white', borderRadius: '.5em', marginLeft: '5px', padding: '5px'}}>Show</span>
                 </a>
               </h1>
               {route === 'home' &&
@@ -157,8 +157,8 @@ export default class Page extends Component {
             </div>
           </div>
           {videoId &&
-            <div style={{minWidth: '400px', maxWidth: '800px', textAlign: 'center', margin: 'auto', marginTop: '24px', padding: '0 15px'}}>
-              <div className="responsive-iframe" style={{marginLeft: '-15px', marginRight: '-15px'}}>
+            <div style={{minWidth: '280px', maxWidth: '800px', textAlign: 'center', margin: 'auto', marginTop: '1.5em', padding: '0 12px'}}>
+              <div className="responsive-iframe" style={{marginLeft: '-12px', marginRight: '-12px'}}>
                 <YouTube
                   className="block"
                   videoId={videoId}
@@ -173,10 +173,10 @@ export default class Page extends Component {
               </div>
               {this.state.video && route === 'home' && <Editor video={this.state.video} videoId={videoId} onVideoSent={(id, url) => this.setState({id, url})} />}
               {this.state.video && route === 'video' && (
-                <div style={{fontFamily: 'Roboto, sans-serif', color: 'white', margin: '24px 0'}}>
+                <div style={{fontFamily: 'Roboto, sans-serif', color: 'white', margin: '1.5em 0'}}>
                   Go to :
                   {this.state.breakpoints.map(
-                    b => <RaisedButton primary={true} label={b.title} style={{margin: 5}} onTouchTap={() => this.state.video.seekTo(b.time)} />
+                    b => <RaisedButton primary={true} label={b.title} style={{margin: '5px'}} onTouchTap={() => this.state.video.seekTo(b.time)} />
                   )}
                 </div>
               )}

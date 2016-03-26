@@ -3,6 +3,7 @@
       xmlns:fb="http://ogp.me/ns/fb#">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:image" content="https://cloud.githubusercontent.com/assets/969003/13937144/f70f7c9c-efc2-11e5-944f-6fb0369608ac.png" />
     <meta name="theme-color" content="#F44336" />
     <meta name="apple-mobile-web-app-status-bar-style" content="#F44336" />
@@ -20,6 +21,7 @@
       html, body, #app {
         margin: 0;
         height: 100%;
+        font-size: 80%;
       }
 
       .block {
@@ -39,6 +41,12 @@
         left: 0;
         width: 100%;
         height: 100%;
+      }
+
+      @media (min-width: 400px) {
+        html, body, #app {
+          font-size: 100%;
+        }
       }
     </style>
   </head>

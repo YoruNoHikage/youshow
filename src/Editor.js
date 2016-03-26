@@ -139,10 +139,10 @@ export default class Editor extends Component {
       });
     };
 
-    const renderPoint = (time, color, removable = true) => {
+    const renderPoint = (time, color, removable = true, key = time) => {
       const left = time / duration * 100;
       return (
-        <span key={time} style={{position: 'absolute', top: '-100%', left: `${left}%`, width: 10, transform: 'translate(-50%)', cursor: 'pointer'}}>
+        <span key={key} style={{position: 'absolute', top: '-100%', left: `${left}%`, width: 10, transform: 'translate(-50%)', cursor: 'pointer'}}>
           <span
             onTouchTap={() => video.seekTo(time)}
             style={{position: 'absolute', left: '0', right: '0', bottom: '0', top: '0'}} />
@@ -193,10 +193,10 @@ export default class Editor extends Component {
     return (
       <div>
         <div style={{padding: '5px 0'}}>
-          <div style={{height: 5, position: 'relative', background: 'rgba(0,0,0,0.5)', margin: 12}}>
+          <div style={{height: 5, position: 'relative', background: 'rgba(0,0,0,0.5)', margin: '12px 0'}}>
             <div style={{height: 5, position: 'absolute', background: colors.red600, left: `${start}%`, width: `${diffStartToEnd}%`}} />
-            {renderPoint(this.state.start, colors.grey400, false)}
-            {renderPoint(this.state.end || duration, colors.grey400, false)}
+            {renderPoint(this.state.start, colors.grey400, false, 'start')}
+            {renderPoint(this.state.end || duration, colors.grey400, false, 'end')}
             {this.state.breakpoints.map(b => renderPoint(b.time, colors.red500))}
           </div>
         </div>
