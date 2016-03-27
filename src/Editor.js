@@ -205,16 +205,18 @@ export default class Editor extends Component {
           <RaisedButton secondary={true} label="Set End" style={buttonStyle} onTouchTap={() => this.setEnd(parseInt(video.getCurrentTime()))} />
           <RaisedButton secondary={true} label="Add Breakpoint" style={buttonStyle} onTouchTap={() => this.addBreakpoint(parseInt(video.getCurrentTime()))} />
         </div>
-        {this.state.breakpoints.map(b => (
-          <div>
+        <div>
+          {this.state.breakpoints.map(b => (
             <TextField
+              style={{display: 'block', margin: 'auto'}}
               inputStyle={{color: 'white'}}
               hint="Breakpoint Title"
               defaultValue={b.title}
-              key={parseInt(b.time * 100) / 100}
+              key={(parseInt(b.time * 100) / 100) + ''}
+              name={(parseInt(b.time * 100) / 100) + ''}
               onChange={(e) => this.changeBreakpointTitle(b, e.target.value)} />
-          </div>
-        ))}
+          ))}
+        </div>
         <div style={{margin: '25px 0'}}><Divider /></div>
         <RaisedButton primary={true} label="Send My Show" onTouchTap={this.sendVideo.bind(this)} />
       </div>

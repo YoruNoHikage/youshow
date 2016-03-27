@@ -17,10 +17,9 @@ const FacebookIcon = generateShareIcon('facebook'),
       GooglePlusIcon = generateShareIcon('google'),
       LinkedinIcon = generateShareIcon('linkedin');
 
-const styles = {display: 'inline-block', margin: 10};
-const title = 'YouTube Video via #YouShow';
+const styles = {display: 'inline-block', margin: 10, cursor: 'pointer'};
 
-const SocialIcons = ({ shareUrl }) => (
+const SocialIcons = ({ title, shareUrl }) => (
   <div>
     <FacebookShareButton style={styles} url={shareUrl} title={title}>
       <FacebookIcon size={32} round={true} />

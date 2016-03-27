@@ -46,6 +46,7 @@ export default class Page extends Component {
     this.state = {
       videoId: null,
       video: null,
+      videoDataLoaded: false,
       isLoading: false,
       start: 0,
       end: 0,
@@ -89,6 +90,12 @@ export default class Page extends Component {
       videoId,
     });
     this.forceUpdate();
+  }
+
+  onVideoDataLoaded() {
+    document.title = this.state.video.getVideoData().title + ' - ' + document.title;
+
+    this.setState({videoDataLoaded: true});
   }
 
   componentWillReceiveProps({ route, params }) {
@@ -162,7 +169,11 @@ export default class Page extends Component {
                 <YouTube
                   className="block"
                   videoId={videoId}
-                  onReady={(e) => this.setState({video: e.target})}
+                  onReady={({ target : video }) => {
+                    video.getVideoData(); // load the data asynchronously
+                    this.setState({video});
+                  }}
+                  onStateChange={({ target : video }) => !this.state.videoDataLoaded && video.getVideoData().title && this.onVideoDataLoaded()}
                   opts={{
                     playerVars: {
                       autoplay: 1,
@@ -180,7 +191,7 @@ export default class Page extends Component {
                   )}
                 </div>
               )}
-              {id && <SocialIcons shareUrl={url} />}
+              {id && (this.state.videoDataLoaded ? <SocialIcons title={`${this.state.video.getVideoData().title} via #YouShow`} shareUrl={url} /> : <CircularProgress size={0.5} />)}
               <div style={{fontFamily: 'Roboto, sans-serif', color: colors.grey800}}>
                 <p>
                   Made like this {'╰(•̀ 3 •́)━☆ﾟ.*･｡ﾟ'} by {contributors[random]} and {contributors[(random +1) % 2]}
