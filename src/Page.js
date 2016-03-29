@@ -10,6 +10,7 @@ import AvPlay from 'material-ui/lib/svg-icons/av/play-arrow';
 import CircularProgress from 'material-ui/lib/circular-progress';
 import Paper from 'material-ui/lib/paper';
 import TextField from 'material-ui/lib/text-field';
+import TimeAgo from 'react-timeago';
 
 import Editor from './Editor';
 import SocialIcons from './SocialIcons';
@@ -65,18 +66,24 @@ export default class Page extends Component {
         return response;
       }
 
+      if(response.status === 404) {
+        history.replace('/404');
+      }
+
       var error = new Error(response.statusText);
       error.response = response;
       throw error;
-    }).then(r => r.json()).then(({ src, minTime, maxTime, buttons }) => {
+    }).then(r => r.json()).then(({ src, minTime, maxTime, buttons = [], createdAt }) => {
       this.setState({
         isLoading: false,
         videoId: src,
         start: parseInt(minTime),
         end: parseInt(maxTime),
         breakpoints: buttons.map(({ buttonTitle, buttonTime }) => ({title: buttonTitle, time: buttonTime})),
+        expirationDate: createdAt,
       });
     }).catch(() => this.setState({
+      isLoading: false,
       isSending: false,
       sendingError: true,
     }));
@@ -104,7 +111,17 @@ export default class Page extends Component {
     }
     if(route === '404') {
       this.setState({
-        videoId: '_NXrTujMP50',
+        videoId: 'dQw4w9WgXcQ',
+        start: 0,
+        end: 0,
+        breakpoints: [
+          {title: "Never Gonna Give You Up", time: 43},
+          {title: "Never Gonna Let You Down", time: 45},
+          {title: "Never Gonna Run Around", time: 47},
+          {title: "Never Gonna Make You Cry", time: 51},
+          {title: "Never Gonna Say Goodbye", time: 53},
+          {title: "Never Gonna Tell A Lie", time: 56},
+        ]
       });
     }
   }
@@ -118,7 +135,7 @@ export default class Page extends Component {
 
     return (
       <MuiThemeProvider muiTheme={myTheme}>
-        <div style={{background: colors.grey900, minHeight: '100%', overflow: 'auto'}}>
+        <div style={{background: colors.grey900, minHeight: '100%', overflow: 'auto', fontFamily: 'Roboto, sans-serif', color: 'white'}}>
           <div style={{
               minHeight: videoId && !isLoading ? '0' : '100vh',
               minWidth: '280px',
@@ -132,9 +149,7 @@ export default class Page extends Component {
             <div style={{textAlign: 'center', maxWidth: '640px', width: '100%'}}>
               <h1 style={{
                   transition: 'all 1.5s ease 0s',
-                  fontFamily: 'Roboto, sans-serif',
                   textAlign: 'center',
-                  color: 'white',
                   fontSize: route === 'home' || isLoading ? '5em' : '3em',
                   margin: route === 'home' || isLoading ? '' : '0'}}>
                 <a style={{textDecoration: 'none', color: 'white'}} href="/">
@@ -158,9 +173,7 @@ export default class Page extends Component {
               {route === 'video' && isLoading &&
                 <CircularProgress color="white" />
               }
-              {route === '404' &&
-                <p>404</p>/*Here with WTF breakpoints https://www.youtube.com/watch?v=_NXrTujMP50*/
-              }
+              {route === '404' && <p>404</p>}
             </div>
           </div>
           {videoId &&
@@ -183,8 +196,8 @@ export default class Page extends Component {
                   }} />
               </div>
               {this.state.video && route === 'home' && <Editor video={this.state.video} videoId={videoId} onVideoSent={(id, url) => this.setState({id, url})} />}
-              {this.state.video && route === 'video' && (
-                <div style={{fontFamily: 'Roboto, sans-serif', color: 'white', margin: '1.5em 0'}}>
+              {this.state.video && (route === 'video' || route === '404') && this.state.breakpoints.length > 1 && (
+                <div style={{margin: '1.5em 0'}}>
                   Go to :
                   {this.state.breakpoints.map(
                     b => <RaisedButton primary={true} label={b.title} style={{margin: '5px'}} onTouchTap={() => this.state.video.seekTo(b.time)} />
@@ -192,7 +205,8 @@ export default class Page extends Component {
                 </div>
               )}
               {id && (this.state.videoDataLoaded ? <SocialIcons title={`${this.state.video.getVideoData().title} via #YouShow`} shareUrl={url} /> : <CircularProgress size={0.5} />)}
-              <div style={{fontFamily: 'Roboto, sans-serif', color: colors.grey800}}>
+              {id && this.state.expirationDate && <p>Expires in <TimeAgo date={this.state.expirationDate} /></p>}
+              <div style={{color: colors.grey800}}>
                 <p>
                   Made like this {'╰(•̀ 3 •́)━☆ﾟ.*･｡ﾟ'} by {contributors[random]} and {contributors[(random +1) % 2]}
                 </p>

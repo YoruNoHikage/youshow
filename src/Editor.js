@@ -103,7 +103,6 @@ export default class Editor extends Component {
         })),
       }),
     }).then((response) => {
-      console.log(response);
       if(response.ok) {
         return response;
       }
