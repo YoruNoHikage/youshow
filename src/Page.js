@@ -74,13 +74,16 @@ export default class Page extends Component {
       error.response = response;
       throw error;
     }).then(r => r.json()).then(({ src, minTime, maxTime, buttons = [], createdAt }) => {
+      const createdAtDate = new Date(createdAt);
+      createdAtDate.setDate(createdAtDate.getDate() + 2);
+
       this.setState({
         isLoading: false,
         videoId: src,
         start: parseInt(minTime),
         end: parseInt(maxTime),
         breakpoints: buttons.map(({ buttonTitle, buttonTime }) => ({title: buttonTitle, time: buttonTime})),
-        expirationDate: createdAt,
+        expirationDate: createdAtDate,
       });
     }).catch(() => this.setState({
       isLoading: false,
@@ -196,7 +199,7 @@ export default class Page extends Component {
                   }} />
               </div>
               {this.state.video && route === 'home' && <Editor video={this.state.video} videoId={videoId} onVideoSent={(id, url) => this.setState({id, url})} />}
-              {this.state.video && (route === 'video' || route === '404') && this.state.breakpoints.length > 1 && (
+              {this.state.video && (route === 'video' || route === '404') && this.state.breakpoints.length > 0 && (
                 <div style={{margin: '1.5em 0'}}>
                   Go to :
                   {this.state.breakpoints.map(
