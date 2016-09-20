@@ -13,23 +13,28 @@ class App extends Component {
       location: null,
       params: {},
     };
+
+    this.setRoute = this.setRoute.bind(this);
   }
 
   componentDidMount() {
-    history.listen(location => {
-      let route = '404',
-          id = null,
-          params = {};
+    this.setRoute(history.location);
+    history.listen(this.setRoute);
+  }
 
-      if(/^\/watch\/([a-zA-Z0-9]+)$/.test(location.pathname)) {
-        route = 'video';
-        params.id = location.pathname.match(/^\/watch\/([a-zA-Z0-9]+)$/)[1];
-      } else if(location.pathname === '' || location.pathname === '/') {
-        route = 'home';
-      }
+  setRoute(location) {
+    let route = '404',
+        id = null,
+        params = {};
 
-      this.setState({location, route, params});
-    });
+    if(/^\/watch\/([a-zA-Z0-9]+)$/.test(location.pathname)) {
+      route = 'video';
+      params.id = location.pathname.match(/^\/watch\/([a-zA-Z0-9]+)$/)[1];
+    } else if(location.pathname === '' || location.pathname === '/') {
+      route = 'home';
+    }
+
+    this.setState({location, route, params});
   }
 
   render() {

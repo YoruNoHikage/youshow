@@ -16,7 +16,8 @@ module.exports = {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify('production')
+        'NODE_ENV': JSON.stringify('production'),
+        'YOUSHOW_API': JSON.stringify('http://api.youshow.yt')
       }
     }),
     new webpack.ProvidePlugin({

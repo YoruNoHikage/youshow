@@ -14,7 +14,12 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.NoErrorsPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'YOUSHOW_API': JSON.stringify('http://localhost:1337'),
+      }
+    }),
   ],
   module: {
     loaders: [{

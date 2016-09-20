@@ -3,23 +3,23 @@ import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import YouTube from 'react-youtube';
-import AppBar from 'material-ui/lib/app-bar';
-import RaisedButton from 'material-ui/lib/raised-button';
-import IconButton from 'material-ui/lib/icon-button';
-import AvPlay from 'material-ui/lib/svg-icons/av/play-arrow';
-import CircularProgress from 'material-ui/lib/circular-progress';
-import Paper from 'material-ui/lib/paper';
-import TextField from 'material-ui/lib/text-field';
+import AppBar from 'material-ui/AppBar';
+import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import AvPlay from 'material-ui/svg-icons/av/play-arrow';
+import CircularProgress from 'material-ui/CircularProgress';
+import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
 import TimeAgo from 'react-timeago';
 
 import Editor from './Editor';
 import SocialIcons from './SocialIcons';
 
-import * as colors from 'material-ui/lib/styles/colors';
+import * as colors from 'material-ui/styles/colors';
 
 import MyTheme from './theme';
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
-import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import history from './history';
 
@@ -58,8 +58,7 @@ export default class Page extends Component {
   fetchVideo(id) {
     this.setState({isLoading: true});
 
-    fetch(`http://api.youshow.yorunohikage.fr/get.php?id=${id}`, {
-      mode: 'cors',
+    fetch(`${process.env.YOUSHOW_API}/get.php?id=${id}`, {
       headers: {'Accept': 'application/json'},
     }).then((response) => {
       if(response.ok) {
@@ -103,9 +102,15 @@ export default class Page extends Component {
   }
 
   onVideoDataLoaded() {
-    document.title = this.state.video.getVideoData().title + ' - ' + document.title;
-
     this.setState({videoDataLoaded: true});
+  }
+
+  componentDidUpdate() {
+    if(this.state.videoDataLoaded) {
+      document.title = this.state.video.getVideoData().title + ' - ' + document.title;
+      return;
+    }
+    document.title = 'YouShow';
   }
 
   componentWillReceiveProps({ route, params }) {
@@ -126,6 +131,16 @@ export default class Page extends Component {
           {title: "Never Gonna Tell A Lie", time: 56},
         ]
       });
+    } else if(route === 'home') {
+      this.setState({
+        videoId: null,
+        video: null,
+        videoDataLoaded: false,
+        isLoading: false,
+        start: 0,
+        end: 0,
+        breakpoints: [],
+      });
     }
   }
 
@@ -145,19 +160,34 @@ export default class Page extends Component {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: colors.red500,
-              boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.12), 0px 1px 4px rgba(0, 0, 0, 0.12)',
-              transition: 'min-height 1.5s ease 0s',
+              background: route === 'video' && !isLoading ? 'none' : colors.red500,
+              boxShadow: route === 'video' && !isLoading ? 'none' : '0px 1px 6px rgba(0, 0, 0, 0.12), 0px 1px 4px rgba(0, 0, 0, 0.12)',
+              transition: 'min-height 1.5s ease, background-color 300ms ease',
+              transitionDelay: route === 'video' && !isLoading ? '0s, 1.5s' : '300ms, 0s',
               padding: '15px'}}>
             <div style={{textAlign: 'center', maxWidth: '640px', width: '100%'}}>
               <h1 style={{
-                  transition: 'all 1.5s ease 0s',
+                  transition: 'all 1.5s ease',
+                  transitionDelay: route === 'video' && !isLoading ? '0s' : '300ms',
                   textAlign: 'center',
                   fontSize: route === 'home' || isLoading ? '5em' : '3em',
                   margin: route === 'home' || isLoading ? '' : '0'}}>
-                <a style={{textDecoration: 'none', color: 'white'}} href="/">
+                <a style={{
+                    textDecoration: 'none',
+                    color: route === 'video' && !isLoading ? colors.grey600 : 'white',
+                    transition: 'color 300ms ease',
+                    transitionDelay: route === 'video' && !isLoading ? '1.5s' : '0s',
+                }} href="/" onClick={(e) => {e.preventDefault(); history.push('/'); return false;}}>
                   You
-                  <span style={{color: colors.red500, background: 'white', borderRadius: '.5em', marginLeft: '5px', padding: '5px'}}>Show</span>
+                  <span style={{
+                    color: route === 'video' && !isLoading ? colors.grey900 : colors.red500,
+                    background: route === 'video' && !isLoading ? colors.grey600 : 'white',
+                    transition: 'color 300ms ease, background-color 300ms ease',
+                    transitionDelay: route === 'video' && !isLoading ? '1.5s' : '0s',
+                    borderRadius: '.5em',
+                    marginLeft: '5px',
+                    padding: '5px',
+                  }}>Show</span>
                 </a>
               </h1>
               {route === 'home' &&
@@ -208,11 +238,19 @@ export default class Page extends Component {
                 </div>
               )}
               {id && (this.state.videoDataLoaded ? <SocialIcons title={`${this.state.video.getVideoData().title} via #YouShow`} shareUrl={url} /> : <CircularProgress size={0.5} />)}
-              {id && this.state.expirationDate && <p>Expires in <TimeAgo date={this.state.expirationDate} /></p>}
-              <div style={{color: colors.grey800}}>
-                <p>
-                  Made like this {'╰(•̀ 3 •́)━☆ﾟ.*･｡ﾟ'} by {contributors[random]} and {contributors[(random +1) % 2]}
-                </p>
+              {id && this.state.expirationDate && <p>Expires within <TimeAgo date={this.state.expirationDate} formatter={(value, unit) => `${value} ${unit}${value > 1 ? 's': ''}`} /></p>}
+              <div style={{color: colors.grey800, marginTop: '50px', marginBottom: '50px'}}>
+                {route === 'video' && !isLoading ?
+                  <RaisedButton
+                    label="Make my own show"
+                    labelStyle={{color: colors.grey500}}
+                    onTouchTap={() => history.push('/')}
+                  />
+                  :
+                  <p>
+                    Made like this {'╰(•̀ 3 •́)━☆ﾟ.*･｡ﾟ'} by {contributors[random]} and {contributors[(random +1) % 2]}
+                  </p>
+                }
               </div>
             </div>
           }

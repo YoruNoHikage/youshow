@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 
-import RaisedButton from 'material-ui/lib/raised-button';
-import Divider from 'material-ui/lib/divider';
-import IconButton from 'material-ui/lib/icon-button';
-import FloatingActionButton from 'material-ui/lib/floating-action-button';
-import ActionAutoRenew from 'material-ui/lib/svg-icons/action/autorenew';
-import ContentCopy from 'material-ui/lib/svg-icons/content/content-copy';
-import CircularProgress from 'material-ui/lib/circular-progress';
-import Paper from 'material-ui/lib/paper';
-import TextField from 'material-ui/lib/text-field';
+import RaisedButton from 'material-ui/RaisedButton';
+import Divider from 'material-ui/Divider';
+import IconButton from 'material-ui/IconButton';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ActionAutoRenew from 'material-ui/svg-icons/action/autorenew';
+import ContentCopy from 'material-ui/svg-icons/content/content-copy';
+import CircularProgress from 'material-ui/CircularProgress';
+import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
 import SocialIcons from './SocialIcons';
+import { createPath } from 'history';
 
-import * as colors from 'material-ui/lib/styles/colors';
+import * as colors from 'material-ui/styles/colors';
 
 import history from './history';
 
@@ -85,9 +86,8 @@ export default class Editor extends Component {
       isSending: true,
       sendingError: false,
     });
-    fetch('http://api.youshow.yorunohikage.fr/post.php', {
+    fetch(`${process.env.YOUSHOW_API}/post.php`, {
       method: 'post',
-      mode: 'cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -111,7 +111,7 @@ export default class Editor extends Component {
       error.response = response;
       throw error;
     }).then(r => r.json()).then(({ id }) => {
-      const url = window.location.origin + history.createPath('/watch/' + id);
+      const url = window.location.origin + createPath({pathname: '/watch/' + id});
       this.setState({url, isSending: false});
       this.props.onVideoSent(id, url);
     }).catch(() => this.setState({
@@ -189,9 +189,14 @@ export default class Editor extends Component {
       );
     }
 
+    const handleSeekClick = (e) => {
+      const ratio = (e.clientX - e.target.getBoundingClientRect().x) / e.target.getBoundingClientRect().width;
+      video.seekTo(video.getDuration() * ratio, true);
+    };
+
     return (
       <div>
-        <div style={{padding: '5px 0'}}>
+        <div style={{padding: '5px 0'}} onClick={handleSeekClick}>
           <div style={{height: 5, position: 'relative', background: 'rgba(0,0,0,0.5)', margin: '12px 0'}}>
             <div style={{height: 5, position: 'absolute', background: colors.red600, left: `${start}%`, width: `${diffStartToEnd}%`}} />
             {renderPoint(this.state.start, colors.grey400, false, 'start')}
@@ -202,22 +207,26 @@ export default class Editor extends Component {
         <div>
           <RaisedButton secondary={true} label="Set Start" style={buttonStyle} onTouchTap={() => this.setStart(parseInt(video.getCurrentTime()))} />
           <RaisedButton secondary={true} label="Set End" style={buttonStyle} onTouchTap={() => this.setEnd(parseInt(video.getCurrentTime()))} />
-          <RaisedButton secondary={true} label="Add Breakpoint" style={buttonStyle} onTouchTap={() => this.addBreakpoint(parseInt(video.getCurrentTime()))} />
+          <RaisedButton secondary={true} label="Add Shortcut" style={buttonStyle} onTouchTap={() => this.addBreakpoint(parseInt(video.getCurrentTime()))} />
         </div>
         <div>
           {this.state.breakpoints.map(b => (
-            <TextField
-              style={{display: 'block', margin: 'auto'}}
-              inputStyle={{color: 'white'}}
-              hint="Breakpoint Title"
-              defaultValue={b.title}
-              key={(parseInt(b.time * 100) / 100) + ''}
-              name={(parseInt(b.time * 100) / 100) + ''}
-              onChange={(e) => this.changeBreakpointTitle(b, e.target.value)} />
+            <div key={(parseInt(b.time * 100) / 100) + ''}>
+              <label style={{display: 'inline-block'}}>Title : </label>
+              <TextField
+                style={{display: 'inline-block', marginLeft: '10px'}}
+                inputStyle={{color: 'white'}}
+                hintText="Shortcut Title"
+                hintStyle={{color: colors.grey600}}
+                defaultValue={b.title}
+                name={(parseInt(b.time * 100) / 100) + ''}
+                onChange={(e) => this.changeBreakpointTitle(b, e.target.value)} />
+              <label style={{display: 'inline-block', color: colors.grey600, marginLeft: '10px'}}>at {toHHMMSS(b.time)}</label>
+            </div>
           ))}
         </div>
         <div style={{margin: '25px 0'}}><Divider /></div>
-        <RaisedButton primary={true} label="Send My Show" onTouchTap={this.sendVideo.bind(this)} />
+        <RaisedButton primary={true} label="Share My Show" onTouchTap={this.sendVideo.bind(this)} />
       </div>
     );
   }
