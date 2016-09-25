@@ -34,6 +34,8 @@ class App extends Component {
       route = 'home';
     }
 
+    _paq.push(['trackPageView']);
+
     this.setState({location, route, params});
   }
 

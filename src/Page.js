@@ -93,6 +93,7 @@ export default class Page extends Component {
 
   onPasteVideo(e) {
     const videoId = getYouTubeVideoId(e.target.value);
+    _paq.push(['trackEvent', 'Actions', 'pasteVideo']);
     this.setState({
       id: null,
       video: null,

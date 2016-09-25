@@ -86,6 +86,7 @@ export default class Editor extends Component {
       isSending: true,
       sendingError: false,
     });
+    _paq.push(['trackEvent', 'Actions', 'sendVideo']);
     fetch(`${process.env.YOUSHOW_API}/post.php`, {
       method: 'post',
       headers: {
@@ -175,6 +176,7 @@ export default class Editor extends Component {
         <div>
           <Paper style={{display: 'flex', margin: '20px auto'}}>
             <IconButton onClick={() => {
+                _paq.push(['trackEvent', 'Actions', 'copyLink']);
                 this.refs.url.input.select();
                 document.execCommand("copy");
                 this.setState({justCopied: true});
