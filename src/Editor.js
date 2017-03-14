@@ -1,4 +1,6 @@
+/* global _paq */
 import React, { Component } from 'react';
+import firebase from 'firebase';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
@@ -87,34 +89,19 @@ export default class Editor extends Component {
       sendingError: false,
     });
     _paq.push(['trackEvent', 'Actions', 'sendVideo']);
-    fetch(`${process.env.YOUSHOW_API}/post.php`, {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        src: this.props.videoId,
-        title: "No title for now",
-        minTime: this.state.start,
-        maxTime: this.state.end || null,
-        buttons: this.state.breakpoints.map(b => ({
-          buttonTitle: b.title,
-          buttonTime: b.time,
-        })),
-      }),
-    }).then((response) => {
-      if(response.ok) {
-        return response;
-      }
-
-      var error = new Error(response.statusText);
-      error.response = response;
-      throw error;
-    }).then(r => r.json()).then(({ id }) => {
-      const url = window.location.origin + createPath({pathname: '/watch/' + id});
+    firebase.database().ref('videos').push({
+      src: this.props.videoId,
+      title: "No title for now",
+      minTime: this.state.start,
+      maxTime: this.state.end || null,
+      buttons: this.state.breakpoints.map(b => ({
+        buttonTitle: b.title,
+        buttonTime: b.time,
+      })),
+    }).then(({ key }) => {
+      const url = window.location.origin + createPath({pathname: '/watch/' + key});
       this.setState({url, isSending: false});
-      this.props.onVideoSent(id, url);
+      this.props.onVideoSent(key, url);
     }).catch(() => this.setState({
       isSending: false,
       sendingError: true,

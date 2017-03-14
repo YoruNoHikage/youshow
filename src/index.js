@@ -1,9 +1,17 @@
+/* global _paq */
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+import firebase from 'firebase';
 
 import history from './history';
+import './index.css';
 
 import Page from './Page';
+
+firebase.initializeApp({
+  apiKey: 'AIzaSyDsARAOy8nWQpyQbF79fT3tXezPvnGnj2A',
+  databaseURL: 'https://youshow-5c5fa.firebaseio.com/',
+});
 
 class App extends Component {
   constructor() {
@@ -27,9 +35,11 @@ class App extends Component {
         id = null,
         params = {};
 
-    if(/^\/watch\/([a-zA-Z0-9]+)$/.test(location.pathname)) {
+    const reg = /^\/watch\/([a-zA-Z0-9\-_]+)$/;
+
+    if(reg.test(location.pathname)) {
       route = 'video';
-      params.id = location.pathname.match(/^\/watch\/([a-zA-Z0-9]+)$/)[1];
+      params.id = location.pathname.match(reg)[1];
     } else if(location.pathname === '' || location.pathname === '/') {
       route = 'home';
     }

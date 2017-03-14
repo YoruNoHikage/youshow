@@ -1,6 +1,7 @@
+/* global _paq */
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import firebase from 'firebase';
 
 import YouTube from 'react-youtube';
 import AppBar from 'material-ui/AppBar';
@@ -58,23 +59,14 @@ export default class Page extends Component {
   fetchVideo(id) {
     this.setState({isLoading: true});
 
-    fetch(`${process.env.YOUSHOW_API}/get.php?id=${id}`, {
-      headers: {'Accept': 'application/json'},
-    }).then((response) => {
-      if(response.ok) {
-        return response;
-      }
+    firebase.database().ref('videos/' + id).once('value', (snapshot) => {
+      const video = snapshot.val();
 
-      if(response.status === 404) {
+      if (!video) {
         history.replace('/404');
       }
 
-      var error = new Error(response.statusText);
-      error.response = response;
-      throw error;
-    }).then(r => r.json()).then(({ src, minTime, maxTime, buttons = [], createdAt }) => {
-      const createdAtDate = new Date(createdAt);
-      createdAtDate.setDate(createdAtDate.getDate() + 2);
+      const { src, minTime, maxTime, buttons = [], createdAt } = video;
 
       this.setState({
         isLoading: false,
@@ -82,7 +74,6 @@ export default class Page extends Component {
         start: parseInt(minTime),
         end: parseInt(maxTime),
         breakpoints: buttons.map(({ buttonTitle, buttonTime }) => ({title: buttonTitle, time: buttonTime})),
-        expirationDate: createdAtDate,
       });
     }).catch(() => this.setState({
       isLoading: false,
@@ -239,7 +230,6 @@ export default class Page extends Component {
                 </div>
               )}
               {id && (this.state.videoDataLoaded ? <SocialIcons title={`${this.state.video.getVideoData().title} via #YouShow`} shareUrl={url} /> : <CircularProgress size={0.5} />)}
-              {id && this.state.expirationDate && <p>Expires within <TimeAgo date={this.state.expirationDate} formatter={(value, unit) => `${value} ${unit}${value > 1 ? 's': ''}`} /></p>}
               <div style={{color: colors.grey800, marginTop: '50px', marginBottom: '50px'}}>
                 {route === 'video' && !isLoading ?
                   <RaisedButton
