@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import firebase from 'firebase';
-
 import history from './history';
+
+import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
 import Page from './Page';
@@ -58,3 +59,6 @@ render(
   <App />,
   document.getElementById('app')
 );
+
+registerServiceWorker();
+
